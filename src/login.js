@@ -330,7 +330,7 @@ class LoginSystem {
             
             if (result.success) {
                 await this.saveLoginSession(licenseKey, pcid);
-                this.showNotification('Login berhasil! Mengarahkan...', 'success');
+                this.showNotification('Login success! ', 'success');
                 
                 setTimeout(() => {
                     window.location.href = 'index.html';
@@ -454,15 +454,16 @@ class LoginSystem {
     }
 
     getErrorMessage(errorCode, apiMessage) {
-        const messages = {
-            0: 'License tidak ditemukan atau tidak valid',
-            1: 'Data license tidak lengkap',
-            2: 'License sudah expired',
-            3: 'Login berhasil', // Should not be used as error
-            4: 'Data yang dikirim tidak lengkap',
-            5: 'License sudah terdaftar di device lain',
-            'default': apiMessage || 'Terjadi kesalahan yang tidak diketahui'
-        };
+            const messages = {
+                0: 'License not found or invalid',
+                1: 'Incomplete license data',
+                2: 'License has expired',
+                3: 'Login Success', // Should not be used as an error
+                4: 'Incomplete data submitted',
+                5: 'License already registered on another device',
+                'default': apiMessage || 'An unknown error has occurred'
+            };
+
         
         return messages[errorCode] || messages['default'];
     }
