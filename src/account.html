@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Blaze</title>
+    <link href="./styles/tailwind.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+/* Ensure proper tab display */
+.tab-content.hidden,
+.sub-tabs.hidden,
+.sub-tab-content.hidden,
+.group-sub-tab-content.hidden {
+    display: none !important;
+}
+
+/* Main tab active states */
+.main-tab-button.active[data-tab="extractor"] {
+    color: #2563eb !important;
+    border-bottom-color: #3b82f6 !important;
+}
+
+.main-tab-button.active[data-tab="automation"] {
+    color: #7c3aed !important;
+    border-bottom-color: #8b5cf6 !important;
+}
+
+.main-tab-button.active[data-tab="reply"] {
+    color: #059669 !important;
+    border-bottom-color: #10b981 !important;
+}
+
+/* Sub tab active states */
+#extractorSubTabs .sub-tab-button.active {
+    color: #2563eb !important;
+    border-bottom-color: #3b82f6 !important;
+}
+
+#automationSubTabs .sub-tab-button.active {
+    color: #7c3aed !important;
+    border-bottom-color: #8b5cf6 !important;
+}
+
+/* Group sub tab active states */
+.group-sub-tab-button.active {
+    color: #2563eb !important;
+    border-bottom-color: #3b82f6 !important;
+}
+
+/* Custom scrollbar for all tables */
+.table-container {
+    max-height: 500px !important;
+    height: 500px !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+}
+
+/* Custom scrollbar styling */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.table-container::-webkit-scrollbar-corner {
+    background: #f1f5f9;
+}
+
+/* Custom scrollbar for message log */
+.message-log-container {
+    max-height: 300px !important;
+    overflow-y: auto !important;
+}
+
+.message-log-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.message-log-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.message-log-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.message-log-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Glass effect */
+.glass-effect {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Smooth transitions */
+.smooth-transition {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Table specific styles */
+.table-fixed-layout {
+    table-layout: fixed;
+}
+
+.table-auto-layout {
+    table-layout: auto;
+}
+
+/* Sticky headers for better scrolling */
+.sticky-header th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    z-index: 10;
+    box-shadow: 0 1px 0 #e2e8f0;
+}
+
+/* Auto Reply Specific Styles */
+.rule-row {
+    transition: all 0.2s ease-in-out;
+}
+
+.rule-row:hover {
+    background-color: #f8fafc;
+}
+
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-active {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.status-inactive {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Progress bar */
+.progress-bar {
+    transition: width 0.3s ease-in-out;
+}
+
+/* Message log styles */
+.message-log-row {
+    transition: background-color 0.2s ease;
+}
+
+.message-log-row:hover {
+    background-color: #f8fafc;
+}
+
+/* Responsive table container */
+@media (max-height: 800px) {
+    .table-container {
+        max-height: 400px !important;
+        height: 400px !important;
+    }
+}
+
+@media (max-height: 600px) {
+    .table-container {
+        max-height: 300px !important;
+        height: 300px !important;
+    }
+}
+
+/* Custom scrollbar for sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Table column widths for better layout */
+.table-col-checkbox {
+    width: 50px;
+}
+
+.table-col-number {
+    width: 150px;
+}
+
+.table-col-status {
+    width: 100px;
+}
+
+.table-col-actions {
+    width: 120px;
+}
+
+.table-col-type {
+    width: 100px;
+}
+
+.table-col-member-of {
+    width: 200px;
+}
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 h-screen flex overflow-hidden">
+    <!-- Sidebar Controller (1/3) -->
+    <div class="w-1/3 bg-white/80 glass-effect flex flex-col h-full border-r border-slate-200/60">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white p-6 shadow-lg">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                    <i class="fab fa-whatsapp text-2xl text-green-400"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Waboost</h1>
+                    <p class="text-slate-300 text-sm" id="accountNameDisplay">Account Name</p>
+                </div>
+            </div>
+        </div>
+        <!-- Browser Controls di Sidebar -->
+        <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between border-b border-slate-700">
+            <div class="flex items-center space-x-2">
+                <button onclick="openWebViewDevTools()" class="p-2 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:scale-110" title="DevTools">
+                    <i class="fas fa-code text-sm"></i>
+                </button>
+            </div>
+            <div class="text-xs text-slate-300 font-medium" id="webviewStatus">
+                Initializing...
+            </div>
+        </div>
+
+        <!-- Main Tabs Navigation -->
+        <div class="border-b border-slate-200 bg-white/50 backdrop-blur-sm">
+            <nav class="flex">
+                <button id="tabExtractor" 
+                        class="flex-1 py-4 px-6 text-center font-semibold text-slate-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 transition-all duration-200 main-tab-button active group smooth-transition"
+                        data-tab="extractor">
+                    <i class="fas fa-database mr-2 text-slate-400 group-hover:text-blue-500 group-[.active]:text-blue-500"></i>
+                    Extractor
+                </button>
+                <button id="tabAutomation" 
+                        class="flex-1 py-4 px-6 text-center font-semibold text-slate-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-500 transition-all duration-200 main-tab-button group smooth-transition"
+                        data-tab="automation">
+                    <i class="fas fa-robot mr-2 text-slate-400 group-hover:text-purple-500 group-[.active]:text-purple-500"></i>
+                    Automation
+                </button>
+                <!-- Tab Reply Sederhana -->
+                <button id="tabReply" 
+                        class="flex-1 py-4 px-6 text-center font-semibold text-slate-600 hover:text-green-600 border-b-2 border-transparent hover:border-green-500 transition-all duration-200 main-tab-button group smooth-transition"
+                        data-tab="reply">
+                    <i class="fas fa-reply mr-2 text-slate-400 group-hover:text-green-500 group-[.active]:text-green-500"></i>
+                    Auto Reply
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sub Tabs Navigation (Hanya untuk Extractor dan Automation) -->
+        <div id="extractorSubTabs" class="border-b border-slate-200 bg-gradient-to-r from-slate-50/80 to-blue-50/80 backdrop-blur-sm sub-tabs">
+            <nav class="flex text-sm">
+                <button class="flex-1 py-3 px-4 text-center text-slate-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 transition-all duration-200 sub-tab-button active group smooth-transition"
+                        data-subtab="extract-contact">
+                    <i class="fas fa-users mr-1 group-hover:text-blue-500 group-[.active]:text-blue-500"></i>
+                    Contacts
+                </button>
+                <button class="flex-1 py-3 px-4 text-center text-slate-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 transition-all duration-200 sub-tab-button group smooth-transition"
+                        data-subtab="extract-chat-contact">
+                    <i class="fas fa-comment mr-1 group-hover:text-blue-500 group-[.active]:text-blue-500"></i>
+                    Chat Contact
+                </button>
+                <button class="flex-1 py-3 px-4 text-center text-slate-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 transition-all duration-200 sub-tab-button group smooth-transition"
+                        data-subtab="extract-group">
+                    <i class="fas fa-comments mr-1 group-hover:text-blue-500 group-[.active]:text-blue-500"></i>
+                    Group
+                </button>
+            </nav>
+        </div>
+
+        <div id="automationSubTabs" class="border-b border-slate-200 bg-gradient-to-r from-slate-50/80 to-purple-50/80 backdrop-blur-sm sub-tabs hidden">
+            <nav class="flex text-sm">
+                <button class="flex-1 py-3 px-4 text-center text-slate-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-500 transition-all duration-200 sub-tab-button active group smooth-transition"
+                        data-subtab="send-to-contact">
+                    <i class="fas fa-user mr-1 group-hover:text-purple-500 group-[.active]:text-purple-500"></i>
+                    To Contact
+                </button>
+                <button class="flex-1 py-3 px-4 text-center text-slate-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-500 transition-all duration-200 sub-tab-button group smooth-transition"
+                        data-subtab="send-to-group">
+                    <i class="fas fa-users mr-1 group-hover:text-purple-500 group-[.active]:text-purple-500"></i>
+                    To Group
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+            <!-- Extractor Tab Content -->
+            <div id="extractorContent" class="tab-content space-y-6">
+                <!-- Extract Contact Sub Tab -->
+                <div id="extract-contact-content" class="sub-tab-content">
+                    <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                        <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center">
+                            <i class="fas fa-users mr-2 text-blue-500"></i>
+                            Extract Contacts
+                        </h3>
+                        <div class="grid grid-cols-1 gap-3 mb-6">
+                            <button onclick="loadContacts()" 
+                                    class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-3 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center smooth-transition hover:scale-[1.02]">
+                                <i class="fas fa-download mr-2"></i>
+                                Load Contacts
+                            </button>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="exportContactsToTarget()" 
+                                        class="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white py-2 px-3 rounded-lg transition-all duration-200 shadow hover:shadow-md flex items-center justify-center text-xs smooth-transition">
+                                    <i class="fas fa-share mr-1"></i>
+                                    Export Target
+                                </button>
+                                <button onclick="saveContacts()" 
+                                        class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white py-2 px-3 rounded-lg transition-all duration-200 shadow hover:shadow-md flex items-center justify-center text-xs smooth-transition">
+                                    <i class="fas fa-file-csv mr-1"></i>
+                                    Save CSV
+                                </button>
+                                <button onclick="clearContacts()" 
+                                        class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white py-2 px-3 rounded-lg transition-all duration-200 shadow hover:shadow-md flex items-center justify-center text-xs smooth-transition">
+                                    <i class="fas fa-trash mr-1"></i>
+                                    Clear
+                                </button>
+                                <button onclick="downloadCSVTemplate('contacts')" 
+                                        class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white py-2 px-3 rounded-lg transition-all duration-200 shadow hover:shadow-md flex items-center justify-center text-xs smooth-transition">
+                                    <i class="fas fa-download mr-1"></i>
+                                    Template
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Import CSV Section -->
+                        <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <label class="block text-sm font-medium text-blue-800 mb-2">
+                                <i class="fas fa-file-import mr-1"></i>
+                                Import Contacts from CSV
+                            </label>
+                            <div class="flex space-x-2">
+                                <input type="file" id="importContactsCSV" accept=".csv" 
+                                       class="flex-1 px-3 py-2 border border-blue-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all duration-200"
+                                       onchange="handleCSVImport(event, 'contacts')">
+                            </div>
+                            <p class="text-xs text-blue-600 mt-2">
+                                Format CSV: Name,Number. Contoh: "John Doe","628123456789"
+                            </p>
+                        </div>
+                        
+                        <!-- Search Box -->
+                        <div class="mb-4">
+                            <div class="relative">
+                                <input type="text" id="contactsSearch" placeholder="Search contacts..." 
+                                       class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Data Table for Contacts -->
+                        <div class="mt-4">
+                            <h4 class="font-semibold text-slate-700 mb-3 flex items-center justify-between">
+                                <span>
+                                    <i class="fas fa-table mr-2 text-slate-500"></i>
+                                    Contacts Data (Total: <span id="contactsCount">0</span>)
+                                </span>
+                            </h4>
+                            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                <div class="overflow-x-auto table-container">
+                                    <table class="min-w-full divide-y divide-slate-200 table-auto-layout">
+                                        <thead class="bg-slate-50 sticky-header">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Number</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="contactsTableBody" class="bg-white divide-y divide-slate-200">
+                                            <tr>
+                                                <td colspan="2" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                    <i class="fas fa-inbox text-2xl text-slate-300 mb-2 block"></i>
+                                                    No data loaded yet
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extract Chat Contact Sub Tab -->
+                <div id="extract-chat-contact-content" class="sub-tab-content hidden">
+                    <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                        <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center">
+                            <i class="fas fa-comment mr-2 text-blue-500"></i>
+                            Extract Chat Contacts
+                        </h3>
+                        <div class="grid grid-cols-1 gap-3 mb-6">
+                            <button onclick="loadChatContacts()" 
+                                    class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-3 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center smooth-transition hover:scale-[1.02]">
+                                <i class="fas fa-download mr-2"></i>
+                                Load Chat Contacts
+                            </button>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="exportChatContactsToTarget()" 
+                                        class="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white py-2 px-3 rounded-lg transition-all duration-200 shadow hover:shadow-md flex items-center justify-center text-xs smooth-transition">
+                                    <i class="fas fa-share mr-1"></i>
+                                    Export Target
+                                </button>
+                                <button onclick="saveChatContacts()" 
+                                        class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white py-2 px-3 rounded-lg transition-all duration-200 shadow hover:shadow-md flex items-center justify-center text-xs smooth-transition">
+                                    <i class="fas fa-save mr-1"></i>
+                                    Save
+                                </button>
+                                <button onclick="clearChatContacts()" 
+                                        class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white py-2 px-3 rounded-lg transition-all duration-200 shadow hover:shadow-md flex items-center justify-center text-xs smooth-transition">
+                                    <i class="fas fa-trash mr-1"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Box -->
+                        <div class="mb-4">
+                            <div class="relative">
+                                <input type="text" id="chatContactsSearch" placeholder="Search chat contacts..." 
+                                       class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Data Table for Chat Contacts -->
+                        <div class="mt-4">
+                            <h4 class="font-semibold text-slate-700 mb-3 flex items-center">
+                                <i class="fas fa-table mr-2 text-slate-500"></i>
+                                Chat Contacts Data (Total: <span id="chatContactsCount">0</span>)
+                            </h4>
+                            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                <div class="overflow-x-auto table-container">
+                                    <table class="min-w-full divide-y divide-slate-200 table-auto-layout">
+                                        <thead class="bg-slate-50 sticky-header">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Phone/ID</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-type">Type</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="chatContactsTableBody" class="bg-white divide-y divide-slate-200">
+                                            <tr>
+                                                <td colspan="2" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                    <i class="fas fa-inbox text-2xl text-slate-300 mb-2 block"></i>
+                                                    No data loaded yet
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extract Group Sub Tab -->
+                <div id="extract-group-content" class="sub-tab-content hidden">
+                    <!-- Group Sub Sub Tabs -->
+                    <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60">
+                        <div class="border-b border-slate-200">
+                            <nav class="flex text-xs">
+                                <button class="flex-1 py-2 px-3 text-center text-slate-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 transition-all duration-200 group-sub-tab-button active smooth-transition"
+                                        data-group-subtab="groups">
+                                    <i class="fas fa-users mr-1"></i>
+                                    Groups
+                                </button>
+                                <button class="flex-1 py-2 px-3 text-center text-slate-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-500 transition-all duration-200 group-sub-tab-button smooth-transition"
+                                        data-group-subtab="group-members">
+                                    <i class="fas fa-user-friends mr-1"></i>
+                                    Group Members
+                                </button>
+                            </nav>
+                        </div>
+
+                        <div class="p-6">
+                            <!-- Groups Sub Tab Content -->
+                            <div id="groups-content" class="group-sub-tab-content">
+                                <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center">
+                                    <i class="fas fa-users mr-2 text-blue-500"></i>
+                                    Extract Groups
+                                </h3>
+                                <div class="grid grid-cols-2 gap-3 mb-6">
+                                    <button onclick="loadGroups()" 
+                                            class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-3 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition">
+                                        <i class="fas fa-download mr-2"></i>
+                                        Load Groups
+                                    </button>
+                                    <button onclick="exportGroupsToTarget()" 
+                                            class="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition">
+                                        <i class="fas fa-share mr-2"></i>
+                                        Export Target
+                                    </button>
+                                    <button onclick="extractSelectedMembers()" 
+                                            class="bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition">
+                                        <i class="fas fa-user-friends mr-2"></i>
+                                        Extract Members
+                                    </button>
+                                    <button onclick="clearGroups()" 
+                                            class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white py-3 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition">
+                                        <i class="fas fa-trash mr-2"></i>
+                                        Clear
+                                    </button>
+                                </div>
+                                
+                                <!-- Import CSV Section for Groups -->
+                                <div class="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                                    <label class="block text-sm font-medium text-green-800 mb-2">
+                                        <i class="fas fa-file-import mr-1"></i>
+                                        Import Groups from CSV
+                                    </label>
+                                    <div class="flex space-x-2">
+                                        <input type="file" id="importGroupsCSV" accept=".csv" 
+                                               class="flex-1 px-3 py-2 border border-green-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 transition-all duration-200"
+                                               onchange="handleCSVImport(event, 'groups')">
+                                        <button onclick="downloadCSVTemplate('groups')" 
+                                                class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white py-2 px-3 rounded-lg transition-all duration-200 shadow hover:shadow-md flex items-center justify-center text-xs smooth-transition">
+                                            <i class="fas fa-download mr-1"></i>
+                                            Template
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-green-600 mt-2">
+                                        Format CSV: Name,Group ID. Contoh: "My Group","123456789-123456@g.us"
+                                    </p>
+                                </div>
+                                
+                                <!-- Search Box -->
+                                <div class="mb-4">
+                                    <div class="relative">
+                                        <input type="text" id="groupsSearch" placeholder="Search groups..." 
+                                               class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Groups Table -->
+                                <div class="mt-4">
+                                    <h4 class="font-semibold text-slate-700 mb-3 flex items-center justify-between">
+                                        <span>
+                                            <i class="fas fa-table mr-2 text-slate-500"></i>
+                                            Groups Data (Total: <span id="groupsCount">0</span>)
+                                        </span>
+                                        <label class="flex items-center text-sm text-slate-600">
+                                            <input type="checkbox" id="selectAllGroups" onchange="toggleSelectAllGroups()" class="mr-2 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                            Select All
+                                        </label>
+                                    </h4>
+                                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="overflow-x-auto table-container">
+                                            <table class="min-w-full divide-y divide-slate-200 table-fixed-layout">
+                                                <thead class="bg-slate-50 sticky-header">
+                                                    <tr>
+                                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-checkbox">
+                                                            <input type="checkbox" id="selectAllGroupsHeader" onchange="toggleSelectAllGroups()" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                                        </th>
+                                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
+                                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">ID Group</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="groupsTableBody" class="bg-white divide-y divide-slate-200">
+                                                    <tr>
+                                                        <td colspan="3" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                            <i class="fas fa-inbox text-2xl text-slate-300 mb-2 block"></i>
+                                                            No data loaded yet
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Group Members Sub Tab Content -->
+                            <div id="group-members-content" class="group-sub-tab-content hidden">
+                                <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center">
+                                    <i class="fas fa-user-friends mr-2 text-blue-500"></i>
+                                    Group Members
+                                </h3>
+                                <div class="grid grid-cols-3 gap-3 mb-6">
+                                    <button onclick="exportMembersToTarget()" 
+                                            class="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition">
+                                        <i class="fas fa-share mr-2"></i>
+                                        Export Target
+                                    </button>
+                                    <button onclick="saveGroupMembers()" 
+                                            class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white py-3 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition">
+                                        <i class="fas fa-save mr-2"></i>
+                                        Save
+                                    </button>
+                                    <button onclick="clearGroupMembers()" 
+                                            class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white py-3 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition">
+                                        <i class="fas fa-trash mr-2"></i>
+                                        Clear
+                                    </button>
+                                </div>
+                                
+                                <!-- Search Box -->
+                                <div class="mb-4">
+                                    <div class="relative">
+                                        <input type="text" id="groupMembersSearch" placeholder="Search group members..." 
+                                               class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Group Members Table -->
+                                <div class="mt-4">
+                                    <h4 class="font-semibold text-slate-700 mb-3 flex items-center">
+                                        <i class="fas fa-table mr-2 text-slate-500"></i>
+                                        Group Members Data (Total: <span id="groupMembersCount">0</span>)
+                                    </h4>
+                                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="overflow-x-auto table-container">
+                                            <table class="min-w-full divide-y divide-slate-200 table-auto-layout">
+                                                <thead class="bg-slate-50 sticky-header">
+                                                    <tr>
+                                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Number</th>
+                                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-member-of">Member Of</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="groupMembersTableBody" class="bg-white divide-y divide-slate-200">
+                                                    <tr>
+                                                        <td colspan="2" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                            <i class="fas fa-inbox text-2xl text-slate-300 mb-2 block"></i>
+                                                            No data loaded yet
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automation Tab Content -->
+            <div id="automationContent" class="tab-content hidden space-y-6">
+                <!-- Automation Settings -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                    <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center">
+                        <i class="fas fa-cogs mr-2 text-purple-500"></i>
+                        Automation Settings
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">
+                                <i class="fas fa-clock mr-1 text-blue-500"></i>
+                                Delay Range (seconds)
+                            </label>
+                            <div class="flex space-x-2">
+                                <input type="number" id="minDelay" placeholder="Min" 
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                       value="2" min="1" max="60">
+                                <input type="number" id="maxDelay" placeholder="Max" 
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                       value="5" min="1" max="60">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">
+                                <i class="fas fa-bed mr-1 text-green-500"></i>
+                                Sleep Time (every X messages)
+                            </label>
+                            <div class="flex space-x-2">
+                                <input type="number" id="sleepAfter" placeholder="After" 
+                                       class="w-1/2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                       value="10" min="1">
+                                <input type="number" id="sleepMinutes" placeholder="Minutes" 
+                                       class="w-1/2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                       value="2" min="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                    <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center">
+                        <i class="fas fa-envelope mr-2 text-purple-500"></i>
+                        Message Content
+                    </h3>
+                    <textarea id="messageInput" 
+                              class="w-full h-32 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm resize-none transition-all duration-200"
+                              placeholder="Tulis pesan yang akan dikirim..."></textarea>
+                    <div class="mt-2 text-xs text-slate-500 flex justify-between">
+                        <span>Gunakan variabel seperti {name} untuk personalisasi</span>
+                        <span id="charCount">0 karakter</span>
+                    </div>
+                    
+                    <!-- File Attachment -->
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                            <i class="fas fa-paperclip mr-1 text-slate-500"></i>
+                            Attachment (Optional)
+                        </label>
+                        <div class="flex items-center space-x-3">
+                            <input type="file" id="fileAttachment" 
+                                   class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all duration-200"
+                                   accept="image/*,.pdf,.doc,.docx">
+                            <button onclick="clearAttachment()" 
+                                    class="px-3 py-2 text-rose-600 hover:text-rose-800 transition-colors smooth-transition">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="attachmentPreview" class="mt-2 hidden">
+                            <!-- Attachment preview will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Send to Contact Sub Tab -->
+                <div id="send-to-contact-content" class="sub-tab-content">
+                    <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                        <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center">
+                            <i class="fas fa-user mr-2 text-green-500"></i>
+                            Send to Contacts
+                        </h3>
+                        <div class="space-y-3 mb-6">
+                            <button onclick="sendToContacts()" 
+                                    class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-3 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center smooth-transition hover:scale-[1.02]">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Send to Contacts
+                            </button>
+                        </div>
+
+                        <!-- Search Box -->
+                        <div class="mb-4">
+                            <div class="relative">
+                                <input type="text" id="sendingContactsSearch" placeholder="Search sending contacts..." 
+                                       class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Contacts Table for Sending -->
+                        <div class="mt-4">
+                            <h4 class="font-semibold text-slate-700 mb-3 flex items-center justify-between">
+                                <span>
+                                    <i class="fas fa-list mr-2 text-slate-500"></i>
+                                    Contact List (Total: <span id="sendingContactsCount">0</span>)
+                                </span>
+                                <label class="flex items-center text-sm text-slate-600">
+                                    <input type="checkbox" id="selectAllSendingContacts" onchange="toggleSelectAllSendingContacts()" class="mr-2 rounded border-slate-300 text-purple-600 focus:ring-purple-500">
+                                    Select All
+                                </label>
+                            </h4>
+                            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                <div class="overflow-x-auto table-container">
+                                    <table class="min-w-full divide-y divide-slate-200 table-fixed-layout">
+                                        <thead class="bg-slate-50 sticky-header">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-checkbox"></th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-number">Number</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-status">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="sendingContactsTableBody" class="bg-white divide-y divide-slate-200">
+                                            <tr>
+                                                <td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                    <i class="fas fa-users text-2xl text-slate-300 mb-2 block"></i>
+                                                    No contacts loaded yet
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Send to Group Sub Tab -->
+                <div id="send-to-group-content" class="sub-tab-content hidden">
+                    <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                        <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center">
+                            <i class="fas fa-users mr-2 text-blue-500"></i>
+                            Send to Groups
+                        </h3>
+                        <div class="space-y-3 mb-6">
+                            <button onclick="loadGroupsForSending()" 
+                                    class="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white py-3 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center smooth-transition hover:scale-[1.02]">
+                                <i class="fas fa-users mr-2"></i>
+                                Load Groups
+                            </button>
+                            <button onclick="sendToGroups()" 
+                                    class="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white py-3 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center smooth-transition hover:scale-[1.02]">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Send to Groups
+                            </button>
+                        </div>
+
+                        <!-- Search Box -->
+                        <div class="mb-4">
+                            <div class="relative">
+                                <input type="text" id="sendingGroupsSearch" placeholder="Search sending groups..." 
+                                       class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Groups Table for Sending -->
+                        <div class="mt-4">
+                            <h4 class="font-semibold text-slate-700 mb-3 flex items-center justify-between">
+                                <span>
+                                    <i class="fas fa-list mr-2 text-slate-500"></i>
+                                    Group List (Total: <span id="sendingGroupsCount">0</span>)
+                                </span>
+                                <label class="flex items-center text-sm text-slate-600">
+                                    <input type="checkbox" id="selectAllSendingGroups" onchange="toggleSelectAllSendingGroups()" class="mr-2 rounded border-slate-300 text-purple-600 focus:ring-purple-500">
+                                    Select All
+                                </label>
+                            </h4>
+                            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                <div class="overflow-x-auto table-container">
+                                    <table class="min-w-full divide-y divide-slate-200 table-fixed-layout">
+                                        <thead class="bg-slate-50 sticky-header">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-checkbox"></th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">ID Group</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-status">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="sendingGroupsTableBody" class="bg-white divide-y divide-slate-200">
+                                            <tr>
+                                                <td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">
+                                                    <i class="fas fa-users text-2xl text-slate-300 mb-2 block"></i>
+                                                    No groups loaded yet
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reply Tab Content - Diperbaiki dengan Start/Stop System -->
+            <div id="replyContent" class="tab-content hidden space-y-6">
+                <!-- Auto Reply Settings -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                    <h3 class="font-bold text-slate-800 mb-6 text-lg flex items-center justify-between">
+                        <span>
+                            <i class="fas fa-cogs mr-2 text-green-500"></i>
+                            Auto Reply Settings
+                        </span>
+                        <div class="flex space-x-2">
+                            <button id="startAutoReplyBtn" 
+                                    onclick="startAutoReply()"
+                                    class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-play mr-2"></i>
+                                Start
+                            </button>
+                            <button id="stopAutoReplyBtn" 
+                                    onclick="stopAutoReply()"
+                                    style="display: none;"
+                                    class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-stop mr-2"></i>
+                                Stop
+                            </button>
+                        </div>
+                    </h3>
+                    
+                    <!-- Check Interval -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                            <i class="fas fa-clock mr-2 text-blue-500"></i>
+                            Cek Pesan Masuk Setiap (detik)
+                        </label>
+                        <input type="number" id="checkInterval" 
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                               value="5" min="1" max="60" placeholder="Interval dalam detik">
+                        <p class="text-xs text-slate-500 mt-1">Pesan masuk akan dicek setiap X detik sekali secara otomatis</p>
+                    </div>
+
+                    <!-- Additional Settings -->
+                    <div class="mb-6 space-y-4">
+                        <label class="flex items-center hidden">
+                            <input type="checkbox" id="replyToGroups" 
+                                   class="h-4 w-4 text-green-600 focus:ring-green-500 border-slate-300 rounded">
+                            <span class="ml-2 text-sm text-slate-700">Balas pesan dari grup</span>
+                        </label>
+                        
+                        <label class="flex items-center">
+                            <input type="checkbox" id="replyToUnknown" checked
+                                   class="h-4 w-4 text-green-600 focus:ring-green-500 border-slate-300 rounded">
+                            <span class="ml-2 text-sm text-slate-700">Balas pesan dari nomor tidak dikenal</span>
+                        </label>
+                    </div>
+
+                    <!-- Status Indicator -->
+                    <div class="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-700">Status Auto Reply:</span>
+                            <span id="autoReplyStatus" class="text-sm font-medium">
+                                <span class="text-red-600"><i class="fas fa-stop-circle mr-1"></i>Berhenti</span>
+                            </span>
+                        </div>
+                        <div class="mt-2 text-xs text-slate-500" id="autoReplyLastCheck">
+                            Terakhir dicek: -
+                        </div>
+                        <div class="mt-1 text-xs text-slate-500" id="autoReplyStats">
+                            Pesan diproses: 0 | Berhasil: 0 | Gagal: 0
+                        </div>
+                        
+                        <!-- Start/Stop Buttons -->
+                        <div class="mt-3 flex space-x-2">
+                            <button id="startAutoReplyMainBtn" 
+                                    onclick="startAutoReply()"
+                                    class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center text-sm">
+                                <i class="fas fa-play mr-2"></i>
+                                Start Auto Reply
+                            </button>
+                            <button id="stopAutoReplyMainBtn" 
+                                    onclick="stopAutoReply()"
+                                    style="display: none;"
+                                    class="flex-1 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center text-sm">
+                                <i class="fas fa-stop mr-2"></i>
+                                Stop Auto Reply
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Save Settings Button -->
+                    <div class="mt-6 pt-6 border-t border-slate-200">
+                        <button onclick="saveReplySettings()" 
+                                class="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white py-3 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center smooth-transition hover:scale-[1.02]">
+                            <i class="fas fa-save mr-2"></i>
+                            Simpan Settings
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reply Rules Table -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                    <h3 class="font-bold text-slate-800 mb-6 text-lg flex items-center justify-between">
+                        <span>
+                            <i class="fas fa-list mr-2 text-green-500"></i>
+                            Reply Rules
+                        </span>
+                        <div class="flex space-x-2">
+                            <button onclick="loadReplyRules()" 
+                                    class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-sync-alt mr-2"></i>
+                                Load
+                            </button>
+                            <button onclick="saveReplyRulesCSV()" 
+                                    class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-file-csv mr-2"></i>
+                                Save CSV
+                            </button>
+                            <button onclick="addNewRule()" 
+                                    class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-plus mr-2"></i>
+                                Tambah Rule
+                            </button>
+                            <button onclick="clearAllRules()" 
+                                    class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-trash mr-2"></i>
+                                Clear All
+                            </button>
+                        </div>
+                    </h3>
+
+                    <!-- Rules Table -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto table-container">
+                            <table class="min-w-full divide-y divide-slate-200 table-fixed-layout">
+                                <thead class="bg-slate-50 sticky-header">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-checkbox">No</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-number">Number</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Keyword</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Response</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-status">Status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="replyRulesTableBody" class="bg-white divide-y divide-slate-200">
+                                    <tr>
+                                        <td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">
+                                            <i class="fas fa-inbox text-2xl text-slate-300 mb-2 block"></i>
+                                            Belum ada rules yang dibuat
+                                            <br>
+                                            <button onclick="addNewRule()" 
+                                                    class="mt-2 text-green-600 hover:text-green-700 text-sm font-medium">
+                                                Klik untuk menambahkan rule pertama
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Table Info -->
+                    <div class="mt-4 flex justify-between items-center">
+                        <div class="text-sm text-slate-600">
+                            Total Rules: <span id="replyRulesCount">0</span>
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            *Kosongkan kolom Number untuk menerapkan ke semua nomor
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Log -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200/60 p-6 smooth-transition">
+                    <h3 class="font-bold text-slate-800 mb-6 text-lg flex items-center justify-between">
+                        <span>
+                            <i class="fas fa-history mr-2 text-green-500"></i>
+                            Message Log
+                        </span>
+                        <div class="flex space-x-2">
+                            <button onclick="loadMessageLog()" 
+                                    class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-sync-alt mr-2"></i>
+                                Refresh
+                            </button>
+                            <button onclick="clearMessageLog()" 
+                                    class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-trash mr-2"></i>
+                                Clear Log
+                            </button>
+                            <button onclick="resetReplyTracker()" 
+                                    class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white py-2 px-4 rounded-lg transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center smooth-transition text-sm">
+                                <i class="fas fa-undo mr-2"></i>
+                                Reset Tracker
+                            </button>
+                        </div>
+                    </h3>
+
+                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto message-log-container">
+                            <table class="min-w-full divide-y divide-slate-200 table-auto-layout">
+                                <thead class="bg-slate-50 sticky-header">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Time</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">From</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Message</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Response</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-col-status">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="messageLogTableBody" class="bg-white divide-y divide-slate-200">
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
+                                            <i class="fas fa-inbox text-2xl text-slate-300 mb-2 block"></i>
+                                            Belum ada log pesan
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Browser View (2/3) -->
+    <div class="w-2/3 h-full bg-slate-900 flex flex-col" id="browserContainer">
+        <!-- Browser Controls Bar -->
+        <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between border-b border-slate-700">
+            <div class="flex items-center space-x-2">
+                <button onclick="reloadWebView()" class="p-2 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:scale-110" title="Reload">
+                    <i class="fas fa-redo text-sm"></i>
+                </button>
+                <button onclick="goBackWebView()" class="p-2 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:scale-110" title="Back">
+                    <i class="fas fa-arrow-left text-sm"></i>
+                </button>
+                <button onclick="goForwardWebView()" class="p-2 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:scale-110" title="Forward">
+                    <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+                <button onclick="openDevToolsWebView()" class="p-2 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:scale-110" title="DevTools">
+                    <i class="fas fa-code text-sm"></i>
+                </button>
+            </div>
+            <div class="text-xs text-slate-300 font-medium" id="webviewStatus">
+                Initializing...
+            </div>
+        </div>
+
+        <!-- WebView Container -->
+        <div class="flex-1 relative">
+            <!-- WebView Element -->
+            <webview 
+                id="whatsappWebview"
+                useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                style="width: 100%; height: 100%; display: inline-flex;"
+                webpreferences="contextIsolation=true, nodeIntegration=false, enableRemoteModule=false"
+                allowpopups
+            ></webview>
+        </div>
+    </div>
+
+    <script src="./account-renderer.js"></script>
+    <script src="./extractor-functions.js"></script>
+    <script src="./automation-functions.js"></script>
+    <script src="./reply-functions.js"></script>
+</body>
+</html>

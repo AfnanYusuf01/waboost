@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waboost - Account Management</title>
+    <link href="./styles/tailwind.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, 
+                #f8fafc 0%, 
+                #e2e8f0 50%, 
+                #f1f5f9 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .account-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            box-shadow: 
+                0 10px 25px -5px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .account-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+        
+        .account-card:hover {
+            box-shadow: 
+                0 15px 30px -5px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(0, 0, 0, 0.03);
+        }
+        
+        .modal-overlay {
+            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 15px 30px -5px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(0, 0, 0, 0.02);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.2);
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+        }
+        
+        .btn-logout {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.2);
+        }
+        
+        .btn-logout:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            box-shadow: 0 8px 20px rgba(217, 119, 6, 0.3);
+        }
+        
+        .empty-state-icon {
+            opacity: 0.7;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: translateX(400px) scale(0.8);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            max-width: 380px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .notification.show {
+            transform: translateX(0) scale(1);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, 
+                rgba(16, 185, 129, 0.95), 
+                rgba(5, 150, 105, 0.95));
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, 
+                rgba(239, 68, 68, 0.95), 
+                rgba(220, 38, 38, 0.95));
+        }
+        
+        .notification.warning {
+            background: linear-gradient(135deg, 
+                rgba(245, 158, 11, 0.95), 
+                rgba(217, 119, 6, 0.95));
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, 
+                rgba(59, 130, 246, 0.95), 
+                rgba(37, 99, 235, 0.95));
+        }
+        
+        .license-info {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #10b981;
+        }
+        
+        .test-mode-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-left: 8px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .brand-text {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .input-field {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-field:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .account-card {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-12 relative">
+            <!-- Logout Button -->
+            <div class="absolute top-0 right-0 flex items-center space-x-3">
+                <!-- License Info -->
+                <div class="license-info px-4 py-2 rounded-lg text-sm hidden" id="licenseInfo">
+                    <span class="font-medium text-gray-700" id="licenseType">License Type</span>
+                    <span class="test-mode-badge hidden" id="testModeBadge">TEST MODE</span>
+                </div>
+                
+                <button onclick="logout()" 
+                        class="btn-logout text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    Logout
+                </button>
+            </div>
+            <h1 class="text-3xl font-bold brand-text mb-3">Waboost</h1>
+            <p class="text-gray-600 max-w-md mx-auto text-base">Kelola akun WhatsApp automation Anda dengan mudah dan efisien</p>
+        </div>
+
+        <!-- Add Account Button -->
+        <div class="mb-10 flex justify-center">
+            <button onclick="openAddAccountModal()" 
+                    class="btn-primary text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center">
+                <i class="fas fa-plus-circle mr-2"></i>
+                Tambah Akun Baru
+            </button>
+        </div>
+
+        <!-- Accounts Grid -->
+        <div id="accountsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Accounts will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-16 hidden">
+            <div class="empty-state-icon inline-flex items-center justify-center w-24 h-24 rounded-2xl mb-6">
+                <i class="fas fa-users text-4xl text-gray-500"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Belum ada akun</h3>
+            <p class="text-gray-600 mb-6 max-w-sm mx-auto">Tambahkan akun WhatsApp Anda untuk memulai automasi dan kelola percakapan dengan lebih efisien</p>
+            <button onclick="openAddAccountModal()" 
+                    class="bg-white text-green-600 border border-green-200 hover:bg-green-50 px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center mx-auto">
+                <i class="fas fa-plus mr-2"></i>
+                Tambah Akun Pertama
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Account Modal -->
+    <div id="addAccountModal" class="fixed inset-0 flex items-center justify-center hidden z-50 modal-overlay">
+        <div class="modal-content rounded-xl p-6 w-full max-w-md mx-4">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-plus-circle text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800">Tambah Akun Baru</h3>
+            </div>
+            <form id="addAccountForm">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2 text-green-500"></i>
+                        Nama Akun
+                    </label>
+                    <input type="text" id="accountName" 
+                           class="input-field w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+                           placeholder="Masukkan nama akun" required>
+                    <p class="text-xs text-gray-500 mt-2">Nama ini akan membantu Anda mengidentifikasi akun</p>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeAddAccountModal()" 
+                            class="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 font-medium">
+                        <i class="fas fa-times mr-2"></i>
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            class="btn-primary text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center">
+                        <i class="fas fa-save mr-2"></i>
+                        Simpan Akun
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script src="./renderer.js"></script>
+</body>
+</html>

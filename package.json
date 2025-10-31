@@ -1,0 +1,140 @@
+{
+  "name": "waboost",
+  "version": "1.0.0",
+  "description": "Waboost - WhatsApp Automation Tool for All Platforms",
+  "main": "main.js",
+  "author": "Waboost Team <support@waboost.com>",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --x64",
+    "build:mac": "electron-builder --mac --x64 --arm64",
+    "build:linux": "electron-builder --linux --x64",
+    "build:all": "npm run build:win && npm run build:mac && npm run build:linux",
+    "dist": "npm run build:all",
+    "clean": "rimraf dist build",
+    "rebuild": "npm run clean && npm install && npm run build:all"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3",
+    "rimraf": "^5.0.5",
+    "tailwindcss": "^3.3.0"
+  },
+  "build": {
+    "appId": "com.waboost.app",
+    "productName": "Waboost",
+    "copyright": "Copyright © 2024 Waboost",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "preload-webview.js",
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/icons",
+        "to": "icons",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icons/icon.ico",
+      "publisherName": "Waboost",
+      "verifyUpdateCodeSignature": false
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build/icons/icon.icns",
+      "category": "public.app-category.social-networking",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icons/icon.png",
+      "category": "Network",
+      "desktop": {
+        "Name": "Waboost",
+        "Comment": "WhatsApp Automation Tool",
+        "Categories": "Network;InstantMessaging;"
+      },
+      "maintainer": "Waboost Team <support@waboost.com>"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Waboost",
+      "deleteAppDataOnUninstall": true
+    },
+    "portable": {
+      "artifactName": "Waboost-Portable.exe"
+    },
+    "publish": {
+      "provider": "github",
+      "releaseType": "release"
+    }
+  }
+}

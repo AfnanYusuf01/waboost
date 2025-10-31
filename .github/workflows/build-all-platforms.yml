@@ -1,0 +1,94 @@
+name: Build Waboost - All Platforms
+
+on:
+  push:
+    tags: ['v*']           # Trigger saat push tag v1.0.0, dll
+  workflow_dispatch:       # Manual trigger dari web GitHub
+
+jobs:
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build Windows
+      run: npm run build:win
+      
+    - name: Upload Windows Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: waboost-windows
+        path: dist/*.exe
+        retention-days: 30
+
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build macOS
+      run: npm run build:mac
+      
+    - name: Upload macOS Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: waboost-macos
+        path: dist/*.dmg
+        retention-days: 30
+
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install Linux dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y fakeroot rpm
+        
+    - name: Install project dependencies
+      run: npm install
+      
+    - name: Build Linux
+      run: npm run build:linux
+      
+    - name: Upload Linux Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: waboost-linux
+        path: dist/*.AppImage
+        retention-days: 30
