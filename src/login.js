@@ -1,4 +1,4 @@
-// Login System for WhatsApp Blaze - PRODUCTION ONLY (FIXED)
+// Login System for WhatsApp Blaze - PRODUCTION ONLY (FIXED + SECURITY)
 class LoginSystem {
     constructor() {
         // API Configuration - PRODUCTION
@@ -14,9 +14,114 @@ class LoginSystem {
     }
 
     init() {
+        this.setupSecurityProtection(); // 🔒 ADDED SECURITY
         this.setupEventListeners();
         this.checkExistingSession();
         this.setupNotificationStyles();
+    }
+
+    // 🔒 ADDED SECURITY PROTECTION METHODS
+    setupSecurityProtection() {
+        this.preventDeveloperTools();
+        this.disableRightClick();
+        this.disableKeyboardShortcuts();
+        this.detectDevTools();
+    }
+
+    preventDeveloperTools() {
+        // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+        document.addEventListener('keydown', (e) => {
+            if (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                (e.ctrlKey && e.key === 'u')
+            ) {
+                e.preventDefault();
+                this.showSecurityWarning();
+                return false;
+            }
+        });
+
+        // Prevent right-click context menu
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            this.showSecurityWarning();
+            return false;
+        });
+    }
+
+    disableRightClick() {
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // Prevent drag and drop
+        document.addEventListener('dragstart', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => e.preventDefault());
+    }
+
+    disableKeyboardShortcuts() {
+        const disabledKeys = [
+            'F12', 'I', 'J', 'C', 'U'
+        ];
+
+        document.addEventListener('keydown', (e) => {
+            if (
+                (e.ctrlKey && disabledKeys.includes(e.key)) ||
+                (e.ctrlKey && e.shiftKey && disabledKeys.includes(e.key)) ||
+                e.key === 'F12'
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.showSecurityWarning();
+                return false;
+            }
+        });
+    }
+
+    detectDevTools() {
+        // Detect DevTools opening via debugger statement
+        const checkDevTools = () => {
+            const start = Date.now();
+            debugger; // This will pause if DevTools is open
+            const end = Date.now();
+            if (end - start > 100) {
+                this.handleDevToolsDetected();
+            }
+        };
+
+        // Run check periodically
+        setInterval(checkDevTools, 1000);
+
+        // Also check on resize (DevTools often changes window size)
+        let lastWidth = window.innerWidth;
+        window.addEventListener('resize', () => {
+            if (window.innerWidth !== lastWidth) {
+                setTimeout(checkDevTools, 100);
+            }
+            lastWidth = window.innerWidth;
+        });
+    }
+
+    handleDevToolsDetected() {
+        console.log('Developer Tools detected!');
+        this.showSecurityWarning();
+        
+        // Optional: Redirect or disable functionality
+        // document.body.innerHTML = '<h1>Access Denied - Developer Tools Detected</h1>';
+        // window.location.href = 'about:blank';
+    }
+
+    showSecurityWarning() {
+        this.showNotification('Akses developer tools diblokir untuk keamanan', 'warning');
+        
+        // Optional: More aggressive measures
+        // for (let i = 0; i < 10; i++) {
+        //     console.log('⚠️ Developer Tools Detected - Access Blocked ⚠️');
+        // }
     }
 
     setupEventListeners() {
@@ -134,6 +239,21 @@ class LoginSystem {
 
                 @keyframes spin {
                     to { transform: rotate(360deg); }
+                }
+
+                /* Security Warning Styles */
+                .security-warning {
+                    background: linear-gradient(135deg, #f59e0b, #d97706);
+                    border-left: 4px solid #b45309;
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    z-index: 10001;
+                    padding: 20px;
+                    border-radius: 8px;
+                    text-align: center;
+                    min-width: 300px;
                 }
             `;
             document.head.appendChild(style);
