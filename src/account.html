@@ -243,6 +243,42 @@
 
     </style>
 </head>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix semua logo images
+    const logos = document.querySelectorAll('.logo-image, [alt*="Waboost"]');
+    
+    logos.forEach(logo => {
+        // Coba berbagai path yang mungkin
+        const possiblePaths = [
+            './build/icons/icon.png',
+            '../build/icons/icon.png', 
+            'build/icons/icon.png',
+            './build/icon.png',
+            '../build/icon.png'
+        ];
+        
+        let currentTry = 0;
+        
+        function tryNextPath() {
+            if (currentTry >= possiblePaths.length) {
+                // Semua path gagal, gunakan fallback
+                logo.style.background = '#037BEA';
+                logo.innerHTML = '<span style="color:white; font-weight:bold;">WABOOST</span>';
+                return;
+            }
+            
+            logo.src = possiblePaths[currentTry];
+            currentTry++;
+        }
+        
+        logo.onerror = tryNextPath;
+        
+        // Mulai dengan path pertama
+        logo.src = possiblePaths[0];
+    });
+});
+</script>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 h-screen flex overflow-hidden">
     <!-- Sidebar Controller (1/3) -->
     <div class="w-1/3 bg-white/80 glass-effect flex flex-col h-full border-r border-slate-200/60">
@@ -251,7 +287,7 @@
             <div class="flex items-center space-x-3">
                 <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
                     <!-- Ganti ikon WhatsApp dengan logo PNG -->
-                    <img src="../build/icon.png" alt="Waboost Logo" class="w-40 h-20">
+                    <img src="/build/icon.png" alt="Waboost Logo" class="w-40 h-20" id="logo1">
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Waboost</h1>

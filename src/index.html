@@ -254,13 +254,49 @@
         }
     </style>
 </head>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix semua logo images
+    const logos = document.querySelectorAll('.logo-image, [alt*="Waboost"]');
+    
+    logos.forEach(logo => {
+        // Coba berbagai path yang mungkin
+        const possiblePaths = [
+            './build/icons/icon.png',
+            '../build/icons/icon.png', 
+            'build/icons/icon.png',
+            './build/icon.png',
+            '../build/icon.png'
+        ];
+        
+        let currentTry = 0;
+        
+        function tryNextPath() {
+            if (currentTry >= possiblePaths.length) {
+                // Semua path gagal, gunakan fallback
+                logo.style.background = '#037BEA';
+                logo.innerHTML = '<span style="color:white; font-weight:bold;">WABOOST</span>';
+                return;
+            }
+            
+            logo.src = possiblePaths[currentTry];
+            currentTry++;
+        }
+        
+        logo.onerror = tryNextPath;
+        
+        // Mulai dengan path pertama
+        logo.src = possiblePaths[0];
+    });
+});
+</script>
 <body>
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <!-- Header -->
         <div class="text-center mb-12 relative">
             <!-- Logo -->
             <div class="logo-wrapper">
-                <img src="../build/icon.png" alt="Waboost Logo" class="logo-image">
+                <img src="/build/icon.png" alt="Waboost Logo" class="logo-image" id="logo2">
             </div>
             
             <!-- Logout Button -->

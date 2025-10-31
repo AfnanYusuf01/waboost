@@ -201,12 +201,48 @@
         }
     </style>
 </head>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix semua logo images
+    const logos = document.querySelectorAll('.logo-image, [alt*="Waboost"]');
+    
+    logos.forEach(logo => {
+        // Coba berbagai path yang mungkin
+        const possiblePaths = [
+            './build/icons/icon.png',
+            '../build/icons/icon.png', 
+            'build/icons/icon.png',
+            './build/icon.png',
+            '../build/icon.png'
+        ];
+        
+        let currentTry = 0;
+        
+        function tryNextPath() {
+            if (currentTry >= possiblePaths.length) {
+                // Semua path gagal, gunakan fallback
+                logo.style.background = '#037BEA';
+                logo.innerHTML = '<span style="color:white; font-weight:bold;">WABOOST</span>';
+                return;
+            }
+            
+            logo.src = possiblePaths[currentTry];
+            currentTry++;
+        }
+        
+        logo.onerror = tryNextPath;
+        
+        // Mulai dengan path pertama
+        logo.src = possiblePaths[0];
+    });
+});
+</script>
 <body>
     <div class="login-container px-4">
         <div class="login-card w-full max-w-md p-8">
             <!-- Logo -->
             <div class="logo-wrapper">
-                <img src="../build/icon.png" alt="Waboost Logo" class="logo-image">
+                <img src="/build/icon.png" alt="Waboost Logo" class="logo-image" id="logo3">
             </div>
             
             <!-- Header -->
