@@ -264,7 +264,7 @@ class LoginSystem {
         try {
             const session = this.validateSession();
             if (session.isValid) {
-                this.showQuickLoginOption(session.remainingMinutes);
+                // this.showQuickLoginOption(session.remainingMinutes);
                 this.prefillLicenseField();
                 console.log('Session valid, remaining:', session.remainingMinutes + ' minutes');
             } else if (session.license) {
@@ -538,41 +538,41 @@ class LoginSystem {
     }
 
     clearSession() {
+        // MODIFIED: Hanya hapus data session, JANGAN hapus PCID/deviceId
         localStorage.removeItem('whatsappBlaze_license');
-        localStorage.removeItem('whatsappBlaze_pcid');
+        // localStorage.removeItem('whatsappBlaze_pcid'); // ❌ JANGAN DIHAPUS (PCID tetap disimpan)
         localStorage.removeItem('whatsappBlaze_loginTime');
         localStorage.removeItem('whatsappBlaze_expiredTime');
-        console.log('Session cleared due to license error');
+        
+        console.log('Session cleared (PCID preserved)');
     }
 
-    showQuickLoginOption(remainingMinutes) {
-        // Remove existing quick login button if any
-        const existingBtn = document.querySelector('.quick-login-btn');
-        if (existingBtn) {
-            existingBtn.remove();
-        }
+    // showQuickLoginOption(remainingMinutes) {
+    //     // Remove existing quick login button if any
+    //     const existingBtn = document.querySelector('.quick-login-btn');
+    //     if (existingBtn) {
+    //         existingBtn.remove();
+    //     }
         
-        const quickLoginBtn = document.createElement('button');
-        quickLoginBtn.type = 'button';
-        quickLoginBtn.className = 'quick-login-btn w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-200 mb-3 flex items-center justify-center';
-        quickLoginBtn.innerHTML = `
-            <i class="fas fa-bolt mr-2"></i>
-            Quick Login (${remainingMinutes}m tersisa)
-        `;
+    //     const quickLoginBtn = document.createElement('button');
+    //     quickLoginBtn.type = 'button';
+    //     quickLoginBtn.className = 'quick-login-btn w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-200 mb-3 flex items-center justify-center';
+    //     quickLoginBtn.innerHTML = `
+    //     `;
         
-        quickLoginBtn.onclick = () => {
-            console.log('Quick login activated');
-            this.showNotification('Quick login berhasil!', 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 500);
-        };
+    //     quickLoginBtn.onclick = () => {
+    //         console.log('Quick login activated');
+    //         this.showNotification('Quick login berhasil!', 'success');
+    //         setTimeout(() => {
+    //             window.location.href = 'index.html';
+    //         }, 500);
+    //     };
         
-        const submitBtn = document.querySelector('#loginForm button[type="submit"]');
-        if (submitBtn && submitBtn.parentNode) {
-            submitBtn.parentNode.insertBefore(quickLoginBtn, submitBtn);
-        }
-    }
+    //     const submitBtn = document.querySelector('#loginForm button[type="submit"]');
+    //     if (submitBtn && submitBtn.parentNode) {
+    //         submitBtn.parentNode.insertBefore(quickLoginBtn, submitBtn);
+    //     }
+    // }
 
     prefillLicenseField() {
         const license = localStorage.getItem('whatsappBlaze_license');

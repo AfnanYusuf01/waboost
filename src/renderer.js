@@ -1,4 +1,93 @@
-// Account Management Functions dengan Authentication System dan Window Management
+// Account Management Functions with Authentication System and Window Management
+
+// ============================================================================
+// SECURITY & DEVTOOLS PROTECTION
+// ============================================================================
+
+// Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+function disableDevTools() {
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+            showWarning('Developer tools are disabled');
+            return false;
+        }
+        
+        // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+            e.preventDefault();
+            showWarning('Developer tools are disabled');
+            return false;
+        }
+        
+        // Ctrl+U (View Source)
+        if (e.ctrlKey && e.key === 'u') {
+            e.preventDefault();
+            showWarning('View source is disabled');
+            return false;
+        }
+        
+        // Right click context menu
+        if (e.key === 'ContextMenu') {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Prevent right-click context menu
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showWarning('Right-click is disabled');
+        return false;
+    });
+
+    // Detect and prevent devtools opening
+    let devToolsOpen = false;
+    
+    // Method 1: Check window dimensions
+    const threshold = 160;
+    const checkDevTools = function() {
+        const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        
+        if (!(widthThreshold || heightThreshold)) {
+            const element = new Image();
+            Object.defineProperty(element, 'id', {
+                get: function() {
+                    devToolsOpen = true;
+                    showWarning('Developer tools detected');
+                }
+            });
+            console.log(element);
+        }
+        
+        if (devToolsOpen) {
+            showWarning('Please close developer tools');
+            // Optional: Redirect or take other actions
+            // window.location.reload();
+        }
+    };
+    
+    setInterval(checkDevTools, 1000);
+
+    // Method 2: Debugger protection
+    function debuggerProtection() {
+        setInterval(function() {
+            (function() {
+                return false;
+            }
+            ['constructor']('debugger')
+            ['call']());
+        }, 5000);
+    }
+    
+    try {
+        debuggerProtection();
+    } catch (err) {
+        // Silent catch
+    }
+}
 
 // ============================================================================
 // AUTHENTICATION SYSTEM
@@ -28,7 +117,7 @@ function setupLicenseInfo() {
         testModeBadge.classList.remove('hidden');
         licenseInfo.classList.remove('hidden');
     } else if (licenseKey) {
-        // Tampilkan sebagian license key untuk keamanan
+        // Display partial license key for security
         const maskedLicense = licenseKey.substring(0, 8) + '***' + licenseKey.substring(licenseKey.length - 4);
         licenseType.textContent = `License: ${maskedLicense}`;
         testModeBadge.classList.add('hidden');
@@ -39,24 +128,24 @@ function setupLicenseInfo() {
 }
 
 async function logout() {
-    if (confirm('Apakah Anda yakin ingin logout? Semua window akun WhatsApp akan ditutup.')) {
+    if (confirm('Are you sure you want to logout? All WhatsApp account windows will be closed.')) {
         try {
             // Show loading state
-            showNotification('Menutup semua window...', 'info');
+            showNotification('Closing all windows...', 'info');
             
             // Clear all auth data
             localStorage.removeItem('whatsappBlaze_license');
             localStorage.removeItem('whatsappBlaze_pcid');
             localStorage.removeItem('whatsappBlaze_testMode');
             
-            // Tutup semua window account yang terbuka
+            // Close all open account windows
             await closeAllAccountWindows();
             
-            // Tunggu sebentar sebelum redirect
+            // Wait a moment before redirect
             setTimeout(() => {
-                showNotification('Logout berhasil', 'success');
+                showNotification('Logout successful', 'success');
                 
-                // Redirect to login page dalam window yang sama
+                // Redirect to login page in the same window
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 1000);
@@ -64,7 +153,7 @@ async function logout() {
             
         } catch (error) {
             console.error('Logout error:', error);
-            showError('Error saat logout: ' + error.message);
+            showError('Error during logout: ' + error.message);
         }
     }
 }
@@ -76,19 +165,19 @@ async function logout() {
 async function closeAllAccountWindows() {
     return new Promise((resolve) => {
         try {
-            // Jika ini adalah main window, coba tutup semua child windows
+            // If this is main window, try to close all child windows
             if (!window.opener) {
-                // Simpan reference ke semua window yang dibuka
+                // Save reference to all opened windows
                 const openedWindows = window.whatsappBlazeOpenedWindows || [];
                 
-                // Tutup semua window yang tercatat
+                // Close all recorded windows
                 openedWindows.forEach(winRef => {
                     try {
                         if (winRef && !winRef.closed) {
                             winRef.close();
                         }
                     } catch (e) {
-                        console.log('Tidak bisa menutup window:', e);
+                        console.log('Cannot close window:', e);
                     }
                 });
                 
@@ -96,7 +185,7 @@ async function closeAllAccountWindows() {
                 window.whatsappBlazeOpenedWindows = [];
             }
             
-            // Jika ini adalah child window (account window), tutup diri sendiri
+            // If this is child window (account window), close itself
             if (window.opener) {
                 window.close();
             }
@@ -104,21 +193,21 @@ async function closeAllAccountWindows() {
             resolve();
         } catch (error) {
             console.error('Error closing windows:', error);
-            resolve(); // Tetap resolve meski ada error
+            resolve(); // Still resolve even if there's error
         }
     });
 }
 
 function trackOpenedWindow(win) {
-    // Initialize tracking array jika belum ada
+    // Initialize tracking array if not exists
     if (!window.whatsappBlazeOpenedWindows) {
         window.whatsappBlazeOpenedWindows = [];
     }
     
-    // Tambahkan window ke tracking array
+    // Add window to tracking array
     window.whatsappBlazeOpenedWindows.push(win);
     
-    // Setup event listener untuk remove window ketika ditutup
+    // Setup event listener to remove window when closed
     win.addEventListener('beforeunload', () => {
         removeTrackedWindow(win);
     });
@@ -133,30 +222,30 @@ function removeTrackedWindow(win) {
 }
 
 function openLoginWindow() {
-    // Buka window login baru
+    // Open new login window
     const loginWindow = window.open('login.html', 'WhatsApp Blaze Login', 
         'width=400,height=500,menubar=no,toolbar=no,location=no,status=no');
     
     if (loginWindow) {
-        showInfo('Window login dibuka di jendela baru');
+        showInfo('Login window opened in new window');
         
-        // Focus ke window login
+        // Focus to login window
         loginWindow.focus();
     } else {
-        showError('Tidak dapat membuka window login. Izinkan popup untuk melanjutkan.');
+        showError('Cannot open login window. Please allow popups to continue.');
     }
 }
 
 function closeCurrentWindow() {
-    // Tutup window saat ini (untuk login window)
+    // Close current window (for login window)
     if (window.opener) {
-        // Jika ini adalah child window, tutup saja
+        // If this is child window, just close
         window.close();
     }
 }
 
 function refreshMainWindow() {
-    // Refresh main window dari child window
+    // Refresh main window from child window
     if (window.opener && !window.opener.closed) {
         window.opener.location.reload();
     }
@@ -194,7 +283,7 @@ async function loadAccounts() {
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800">${account.name || 'Unnamed Account'}</h3>
                             <p class="text-xs text-gray-500 mt-1">ID: ${account.id}</p>
-                            ${account.createdAt ? `<p class="text-xs text-gray-400 mt-1">Dibuat: ${new Date(account.createdAt).toLocaleDateString('id-ID')}</p>` : ''}
+                            ${account.createdAt ? `<p class="text-xs text-gray-400 mt-1">Created: ${new Date(account.createdAt).toLocaleDateString('en-US')}</p>` : ''}
                         </div>
                     </div>
                     <div class="flex items-center">
@@ -216,12 +305,12 @@ async function loadAccounts() {
                     <button onclick="deleteAccount('${account.id}')" 
                             class="text-red-500 hover:text-red-700 transition-colors text-sm font-medium flex items-center group">
                         <i class="fas fa-trash-alt mr-2 group-hover:scale-110 transition-transform"></i>
-                        Hapus
+                        Delete
                     </button>
                     <button onclick="openAccount('${account.id}')" 
                             class="btn-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center group">
                         <i class="fas fa-external-link-alt mr-2 group-hover:scale-110 transition-transform"></i>
-                        Buka Akun
+                        Open Account
                     </button>
                 </div>
             </div>
@@ -232,7 +321,7 @@ async function loadAccounts() {
         
     } catch (error) {
         console.error('Error loading accounts:', error);
-        showError('Gagal memuat akun: ' + error.message);
+        showError('Failed to load accounts: ' + error.message);
     }
 }
 
@@ -241,8 +330,8 @@ function updateAccountCount(count) {
     const currentText = licenseType.textContent;
     
     // Check if we're already showing account count
-    if (!currentText.includes('Akun:')) {
-        licenseType.textContent = `${currentText} | Akun: ${count}`;
+    if (!currentText.includes('Accounts:')) {
+        licenseType.textContent = `${currentText} | Accounts: ${count}`;
     }
 }
 
@@ -252,7 +341,7 @@ async function openAccount(accountId) {
         const accountButtons = document.querySelectorAll(`[onclick="openAccount('${accountId}')"]`);
         accountButtons.forEach(btn => {
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Membuka...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Opening...';
             btn.disabled = true;
             
             // Restore after 2 seconds if something goes wrong
@@ -264,66 +353,66 @@ async function openAccount(accountId) {
         
         const result = await window.electronAPI.openAccount(accountId);
         if (!result.success) {
-            showError('Gagal membuka akun: ' + result.error);
+            showError('Failed to open account: ' + result.error);
             
             // Restore buttons
             accountButtons.forEach(btn => {
-                btn.innerHTML = '<i class="fas fa-external-link-alt mr-2"></i>Buka Akun';
+                btn.innerHTML = '<i class="fas fa-external-link-alt mr-2"></i>Open Account';
                 btn.disabled = false;
             });
         } else {
-            showSuccess('Membuka window akun baru...');
+            showSuccess('Opening new account window...');
             
-            // Track the opened window jika menggunakan window.open
+            // Track the opened window if using window.open
             if (result.window) {
                 trackOpenedWindow(result.window);
             }
         }
     } catch (error) {
         console.error('Error opening account:', error);
-        showError('Error membuka akun: ' + error.message);
+        showError('Error opening account: ' + error.message);
         
         // Restore buttons
         const accountButtons = document.querySelectorAll(`[onclick="openAccount('${accountId}')"]`);
         accountButtons.forEach(btn => {
-            btn.innerHTML = '<i class="fas fa-external-link-alt mr-2"></i>Buka Akun';
+            btn.innerHTML = '<i class="fas fa-external-link-alt mr-2"></i>Open Account';
             btn.disabled = false;
         });
     }
 }
 
 async function deleteAccount(accountId) {
-    if (confirm('Apakah Anda yakin ingin menghapus akun ini? Semua data yang terkait akan dihapus permanen.')) {
+    if (confirm('Are you sure you want to delete this account? All related data will be permanently deleted.')) {
         try {
             // Show loading state
             const deleteButtons = document.querySelectorAll(`[onclick="deleteAccount('${accountId}')"]`);
             deleteButtons.forEach(btn => {
                 const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menghapus...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
                 btn.disabled = true;
             });
             
             const result = await window.electronAPI.deleteAccount(accountId);
             if (result.success) {
                 await loadAccounts();
-                showSuccess('Akun berhasil dihapus');
+                showSuccess('Account successfully deleted');
             } else {
-                showError('Gagal menghapus akun: ' + result.error);
+                showError('Failed to delete account: ' + result.error);
                 
                 // Restore buttons
                 deleteButtons.forEach(btn => {
-                    btn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Hapus';
+                    btn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Delete';
                     btn.disabled = false;
                 });
             }
         } catch (error) {
             console.error('Error deleting account:', error);
-            showError('Error menghapus akun: ' + error.message);
+            showError('Error deleting account: ' + error.message);
             
             // Restore buttons
             const deleteButtons = document.querySelectorAll(`[onclick="deleteAccount('${accountId}')"]`);
             deleteButtons.forEach(btn => {
-                btn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Hapus';
+                btn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Delete';
                 btn.disabled = false;
             });
         }
@@ -366,14 +455,14 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
     
     const accountName = document.getElementById('accountName').value.trim();
     if (!accountName) {
-        showError('Nama akun tidak boleh kosong');
+        showError('Account name cannot be empty');
         return;
     }
 
     // Show loading state
     const submitBtn = document.querySelector('#addAccountForm button[type="submit"]');
     const originalHTML = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
     submitBtn.disabled = true;
 
     try {
@@ -387,13 +476,13 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
         if (result.success) {
             closeAddAccountModal();
             await loadAccounts();
-            showSuccess('Akun berhasil dibuat: ' + accountName);
+            showSuccess('Account successfully created: ' + accountName);
         } else {
-            showError('Gagal menyimpan akun: ' + result.error);
+            showError('Failed to save account: ' + result.error);
         }
     } catch (error) {
         console.error('Error saving account:', error);
-        showError('Error menyimpan akun: ' + error.message);
+        showError('Error saving account: ' + error.message);
     } finally {
         // Restore button state
         submitBtn.innerHTML = originalHTML;
@@ -490,7 +579,7 @@ document.addEventListener('keydown', function(e) {
 
 // Handle window focus/blur events
 window.addEventListener('focus', function() {
-    // Refresh data ketika window mendapatkan focus kembali
+    // Refresh data when window gets focus back
     if (window.location.pathname.includes('index.html')) {
         loadAccounts();
     }
@@ -498,7 +587,7 @@ window.addEventListener('focus', function() {
 
 // Handle window beforeunload event
 window.addEventListener('beforeunload', function() {
-    // Jika ini adalah child window, beri tahu parent bahwa kita akan ditutup
+    // If this is child window, notify parent that we're closing
     if (window.opener && typeof window.opener.removeTrackedWindow === 'function') {
         window.opener.removeTrackedWindow(window);
     }
@@ -509,6 +598,9 @@ window.addEventListener('beforeunload', function() {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize security protections
+    disableDevTools();
+    
     // Check authentication
     if (!checkAuth()) return;
     
@@ -521,9 +613,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show welcome message based on mode
     const isTestMode = localStorage.getItem('whatsappBlaze_testMode') === 'true';
     if (isTestMode) {
-        showWarning('Anda menggunakan TEST MODE - Fitur terbatas');
+        showWarning('You are using TEST MODE - Limited features');
     } else {
-        showSuccess('Login berhasil! Selamat menggunakan WhatsApp Blaze');
+        showSuccess('Login successful! Welcome to WhatsApp Blaze');
     }
     
     // Initialize window tracking array
@@ -531,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.whatsappBlazeOpenedWindows = [];
     }
     
-    // Log window info untuk debugging
+    // Log window info for debugging
     console.log('Window Info:', {
         isMainWindow: !window.opener,
         hasOpener: !!window.opener,
@@ -558,7 +650,7 @@ window.closeAllAccountWindows = closeAllAccountWindows;
 window.trackOpenedWindow = trackOpenedWindow;
 window.removeTrackedWindow = removeTrackedWindow;
 
-// Export untuk diakses dari window lain
+// Export for access from other windows
 window.whatsappBlaze = {
     logout: logout,
     loadAccounts: loadAccounts,
@@ -567,3 +659,4 @@ window.whatsappBlaze = {
 };
 
 console.log('✅ WhatsApp Blaze Account Manager loaded successfully');
+console.log('🔒 Security protections activated');

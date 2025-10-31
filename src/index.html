@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -220,6 +220,24 @@
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
 
+        /* Logo Styles */
+        .logo-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-image {
+            height: 80px;
+            width: auto;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .logo-image:hover {
+            transform: scale(1.05);
+        }
+
         /* Responsive adjustments */
         @media (max-width: 640px) {
             .container {
@@ -229,6 +247,10 @@
             .account-card {
                 margin: 0.5rem 0;
             }
+            
+            .logo-image {
+                height: 70px;
+            }
         }
     </style>
 </head>
@@ -236,6 +258,11 @@
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <!-- Header -->
         <div class="text-center mb-12 relative">
+            <!-- Logo -->
+            <div class="logo-wrapper">
+                <img src="../build/icon.png" alt="Waboost Logo" class="logo-image">
+            </div>
+            
             <!-- Logout Button -->
             <div class="absolute top-0 right-0 flex items-center space-x-3">
                 <!-- License Info -->
@@ -250,8 +277,7 @@
                     Logout
                 </button>
             </div>
-            <h1 class="text-3xl font-bold brand-text mb-3">Waboost</h1>
-            <p class="text-gray-600 max-w-md mx-auto text-base">Kelola akun WhatsApp automation Anda dengan mudah dan efisien</p>
+            <p class="text-gray-600 max-w-md mx-auto text-base">Manage your WhatsApp automation accounts easily and efficiently</p>
         </div>
 
         <!-- Add Account Button -->
@@ -259,7 +285,7 @@
             <button onclick="openAddAccountModal()" 
                     class="btn-primary text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center">
                 <i class="fas fa-plus-circle mr-2"></i>
-                Tambah Akun Baru
+                Add New Account
             </button>
         </div>
 
@@ -273,12 +299,12 @@
             <div class="empty-state-icon inline-flex items-center justify-center w-24 h-24 rounded-2xl mb-6">
                 <i class="fas fa-users text-4xl text-gray-500"></i>
             </div>
-            <h3 class="text-xl font-semibold text-gray-700 mb-3">Belum ada akun</h3>
-            <p class="text-gray-600 mb-6 max-w-sm mx-auto">Tambahkan akun WhatsApp Anda untuk memulai automasi dan kelola percakapan dengan lebih efisien</p>
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">No accounts yet</h3>
+            <p class="text-gray-600 mb-6 max-w-sm mx-auto">Add your WhatsApp accounts to start automation and manage conversations more efficiently</p>
             <button onclick="openAddAccountModal()" 
                     class="bg-white text-green-600 border border-green-200 hover:bg-green-50 px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center mx-auto">
                 <i class="fas fa-plus mr-2"></i>
-                Tambah Akun Pertama
+                Add First Account
             </button>
         </div>
     </div>
@@ -290,29 +316,29 @@
                 <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
                     <i class="fas fa-plus-circle text-white"></i>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800">Tambah Akun Baru</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Add New Account</h3>
             </div>
             <form id="addAccountForm">
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-user mr-2 text-green-500"></i>
-                        Nama Akun
+                        Account Name
                     </label>
                     <input type="text" id="accountName" 
                            class="input-field w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
-                           placeholder="Masukkan nama akun" required>
-                    <p class="text-xs text-gray-500 mt-2">Nama ini akan membantu Anda mengidentifikasi akun</p>
+                           placeholder="Enter account name" required>
+                    <p class="text-xs text-gray-500 mt-2">This name will help you identify the account</p>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="closeAddAccountModal()" 
                             class="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 font-medium">
                         <i class="fas fa-times mr-2"></i>
-                        Batal
+                        Cancel
                     </button>
                     <button type="submit" 
                             class="btn-primary text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center">
                         <i class="fas fa-save mr-2"></i>
-                        Simpan Akun
+                        Save Account
                     </button>
                 </div>
             </form>
